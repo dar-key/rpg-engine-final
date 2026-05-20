@@ -53,3 +53,24 @@ class Character:
                 equipped_tag = " [E-Armor]"
             print(f"  {i}. {item.name}{equipped_tag}  ({item.item_type}, {item.price}g)")
 
+    # ── Derived stats ────────────────────────────────────────────────
+
+    @property
+    def speed(self) -> float:
+        """Speed determines turn order in combat."""
+        bonus = self.equipped["armor"].speed_effect if self.equipped["armor"] else 0
+        formula = self.SPEED_FORMULAS.get(self.speed_formula,
+                                          self.SPEED_FORMULAS["default"])
+        return formula(self.dexterity, bonus)
+
+    @property
+    def damage(self) -> float:
+        """Base damage output."""
+        weapon_bonus = self.equipped["weapon"].attack_effect if self.equipped["weapon"] else 0
+        return self.strength * 1.5 + self.dexterity * 0.5 + weapon_bonus
+
+    @property
+    def max_hp_total(self) -> int:
+        """Max HP including armor bonuses."""
+        armor_bonus = self.equipped["armor"].hp_effect if self.equipped["armor"] else 0
+        return self.max_hp + armor_bonus
