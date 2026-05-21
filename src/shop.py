@@ -1,4 +1,3 @@
-# shop.py
 from item import Item, DEFAULT_ITEMS
 from typing import TYPE_CHECKING
 
@@ -7,23 +6,13 @@ if TYPE_CHECKING:
 
 
 class Shop:
-    """
-    The in-game shop.
 
-    - Loads a catalogue of items (default or from save).
-    - Player can buy items (gold is deducted, item added to inventory).
-    - Player can sell items (gold returned at sell_rate).
-    - Owner (user) can add, remove, and edit shop items at runtime
-      — this is the ENGINE customisation feature.
-    """
-
-    DEFAULT_SELL_RATE = 0.5   # player gets 50% of item price back
+    DEFAULT_SELL_RATE = 0.5 
 
     def __init__(self, items: list[Item] | None = None, sell_rate: float | None = None):
         self.catalogue: list[Item] = items if items is not None else list(DEFAULT_ITEMS)
         self.sell_rate: float = sell_rate if sell_rate is not None else self.DEFAULT_SELL_RATE
 
-    # ── Display ──────────────────────────────────────────────────────
 
     def show_catalogue(self):
         if not self.catalogue:
@@ -46,13 +35,7 @@ class Shop:
         print(f"  Sell rate: {int(self.sell_rate * 100)}% of item price")
         print("=" * 40)
 
-    # ── Transactions ─────────────────────────────────────────────────
-
     def buy(self, character: "Character", item_index: int) -> bool:
-        """
-        Buy item at catalogue[item_index - 1].
-        Returns True on success.
-        """
         if not (1 <= item_index <= len(self.catalogue)):
             print("  Invalid item number.")
             return False
@@ -70,10 +53,6 @@ class Shop:
         return True
 
     def sell(self, character: "Character", inventory_index: int) -> bool:
-        """
-        Sell character.inventory[inventory_index - 1].
-        Returns True on success.
-        """
         if not character.inventory:
             print("  Your inventory is empty.")
             return False
@@ -91,15 +70,12 @@ class Shop:
               f"Total gold: {character.gold}g.")
         return True
 
-    # ── Engine customisation (user can edit the shop) ────────────────
 
     def add_item(self, item: Item):
-        """Add a new item to the shop catalogue (engine feature)."""
         self.catalogue.append(item)
         print(f"  Added to shop: {item.name}")
 
     def remove_item(self, index: int) -> bool:
-        """Remove item by catalogue index (1-based)."""
         if not (1 <= index <= len(self.catalogue)):
             print("  Invalid index.")
             return False
@@ -108,7 +84,6 @@ class Shop:
         return True
 
     def edit_item_price(self, index: int, new_price: int) -> bool:
-        """Change the price of a catalogue item (engine feature)."""
         if not (1 <= index <= len(self.catalogue)):
             print("  Invalid index.")
             return False
@@ -119,17 +94,13 @@ class Shop:
         return True
 
     def set_sell_rate(self, rate: float):
-        """Change the sell-back rate (0.0–1.0)."""
         if not (0.0 <= rate <= 1.0):
             print("  Rate must be between 0.0 and 1.0")
             return
         self.sell_rate = rate
         print(f"  Sell rate updated to {int(rate * 100)}%")
 
-    # ── Interactive menu ─────────────────────────────────────────────
-
     def open(self, character: "Character"):
-        """Full interactive shop menu."""
         while True:
             print("\n--- SHOP ---")
             print("  1. Browse catalogue")
@@ -191,7 +162,6 @@ class Shop:
             else:
                 print("  Unknown option.")
 
-    # ── Serialisation ────────────────────────────────────────────────
 
     def to_dict(self) -> dict:
         return {
@@ -205,10 +175,8 @@ class Shop:
         return cls(items=items, sell_rate=data.get("sell_rate", cls.DEFAULT_SELL_RATE))
 
 
-# ── Helper: prompt user to create a new item ─────────────────────────────────
 
 def _prompt_new_item() -> Item | None:
-    """CLI wizard to create a new Item (ENGINE customisation)."""
     print("\n  -- Create New Item --")
     try:
         name      = input("  Name: ").strip()

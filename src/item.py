@@ -1,11 +1,6 @@
-# items.py
-# RPG Engine — Items module
-# Author: [YourName]
-
 from typing import Optional
 
 
-# Allowed item types and their valid effect fields
 ITEM_TYPES = {
     "weapon": ["attack_effect", "speed_effect"],
     "armor":  ["hp_effect", "speed_effect"],
@@ -16,20 +11,6 @@ RARITIES = ["common", "uncommon", "rare", "epic", "legendary"]
 
 
 class Item:
-    """
-    Represents an in-game item.
-
-    Attributes:
-        name          (str)  : Display name
-        item_type     (str)  : 'weapon', 'armor', or 'potion'
-        rarity        (str)  : One of RARITIES
-        price         (int)  : Gold cost in the shop
-        description   (str)  : Flavour text
-        attack_effect (int)  : Bonus damage (weapons)
-        hp_effect     (int)  : Bonus/heal HP (armor, potions)
-        speed_effect  (int)  : Speed modifier (weapons, armor)
-    """
-
     def __init__(
         self,
         name: str,
@@ -55,7 +36,6 @@ class Item:
         self.hp_effect = hp_effect
         self.speed_effect = speed_effect
 
-    # ── Display ──────────────────────────────────────────────────────
 
     def show(self):
         sep = "-" * 30
@@ -78,7 +58,6 @@ class Item:
         return (f"Item({self.name!r}, type={self.item_type}, "
                 f"rarity={self.rarity}, price={self.price}g)")
 
-    # ── Serialisation (used by save.py) ──────────────────────────────
 
     def to_dict(self) -> dict:
         return {
@@ -106,7 +85,6 @@ class Item:
         )
 
 
-# ── Default item catalogue (also written to items_data.json by save.py) ──────
 
 DEFAULT_ITEMS: list[Item] = [
     Item("Rusty Sword",    "weapon", price=20,  description="Better than nothing.",

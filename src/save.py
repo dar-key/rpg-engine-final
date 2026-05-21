@@ -1,14 +1,10 @@
-# save.py
-# RPG Engine — Save / Load module
-# Author: [YourName]
-
 import json
 import os
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from character import Character
-    from shop import shop
+    from shop import Shop
 
 SAVE_DIR  = "saves"
 SAVE_FILE = os.path.join(SAVE_DIR, "savegame.json")
@@ -17,14 +13,7 @@ SAVE_FILE = os.path.join(SAVE_DIR, "savegame.json")
 def _ensure_save_dir():
     os.makedirs(SAVE_DIR, exist_ok=True)
 
-
-# ── Save ─────────────────────────────────────────────────────────────────────
-
 def save_game(character: "Character", shop: "Shop") -> bool:
-    """
-    Serialise character + shop into saves/savegame.json.
-    Returns True on success.
-    """
     _ensure_save_dir()
     data = {
         "character": character.to_dict(),
@@ -40,13 +29,7 @@ def save_game(character: "Character", shop: "Shop") -> bool:
         return False
 
 
-# ── Load ─────────────────────────────────────────────────────────────────────
-
 def load_game() -> tuple["Character", "Shop"] | None:
-    """
-    Load character + shop from saves/savegame.json.
-    Returns (Character, Shop) tuple, or None if no save exists or file is corrupt.
-    """
     from character import Character
     from shop import Shop
 
@@ -65,8 +48,6 @@ def load_game() -> tuple["Character", "Shop"] | None:
         print(f"  Save file is corrupt or incompatible: {e}")
         return None
 
-
-# ── Utilities ─────────────────────────────────────────────────────────────────
 
 def save_exists() -> bool:
     return os.path.exists(SAVE_FILE)
