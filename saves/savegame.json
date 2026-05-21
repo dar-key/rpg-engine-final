@@ -1,0 +1,125 @@
+{
+  "character": {
+    "name": "Nurtore",
+    "level": 1,
+    "strength": 3,
+    "dexterity": 8,
+    "intelligence": 4,
+    "max_hp": 100,
+    "hp": 0,
+    "gold": 10,
+    "experience": 0,
+    "speed_formula": "default",
+    "inventory": [
+      {
+        "name": "Rusty Sword",
+        "item_type": "weapon",
+        "price": 15,
+        "description": "Better than nothing.",
+        "rarity": "common",
+        "attack_effect": 5,
+        "hp_effect": 0,
+        "speed_effect": 0
+      },
+      {
+        "name": "Leather Armor",
+        "item_type": "armor",
+        "price": 25,
+        "description": "Flexible, light protection.",
+        "rarity": "common",
+        "attack_effect": 0,
+        "hp_effect": 15,
+        "speed_effect": 0
+      }
+    ],
+    "equipped": {
+      "weapon": null,
+      "armor": null
+    }
+  },
+  "shop": {
+    "sell_rate": 1.0,
+    "catalogue": [
+      {
+        "name": "Rusty Sword",
+        "item_type": "weapon",
+        "price": 15,
+        "description": "Better than nothing.",
+        "rarity": "common",
+        "attack_effect": 5,
+        "hp_effect": 0,
+        "speed_effect": 0
+      },
+      {
+        "name": "Iron Sword",
+        "item_type": "weapon",
+        "price": 60,
+        "description": "Standard soldier issue.",
+        "rarity": "uncommon",
+        "attack_effect": 12,
+        "hp_effect": 0,
+        "speed_effect": 1
+      },
+      {
+        "name": "Shadow Blade",
+        "item_type": "weapon",
+        "price": 150,
+        "description": "Light and deadly.",
+        "rarity": "rare",
+        "attack_effect": 18,
+        "hp_effect": 0,
+        "speed_effect": 5
+      },
+      {
+        "name": "Leather Armor",
+        "item_type": "armor",
+        "price": 25,
+        "description": "Flexible, light protection.",
+        "rarity": "common",
+        "attack_effect": 0,
+        "hp_effect": 15,
+        "speed_effect": 0
+      },
+      {
+        "name": "Chain Mail",
+        "item_type": "armor",
+        "price": 80,
+        "description": "Solid mid-tier armor.",
+        "rarity": "uncommon",
+        "attack_effect": 0,
+        "hp_effect": 30,
+        "speed_effect": -2
+      },
+      {
+        "name": "Dragon Scale",
+        "item_type": "armor",
+        "price": 200,
+        "description": "Forged from dragon hide.",
+        "rarity": "rare",
+        "attack_effect": 0,
+        "hp_effect": 60,
+        "speed_effect": -1
+      },
+      {
+        "name": "Small Potion",
+        "item_type": "potion",
+        "price": 15,
+        "description": "Restores 30 HP.",
+        "rarity": "common",
+        "attack_effect": 0,
+        "hp_effect": 30,
+        "speed_effect": 0
+      },
+      {
+        "name": "Large Potion",
+        "item_type": "potion",
+        "price": 40,
+        "description": "Restores 75 HP.",
+        "rarity": "uncommon",
+        "attack_effect": 0,
+        "hp_effect": 75,
+        "speed_effect": 0
+      }
+    ]
+  }
+}
