@@ -6,18 +6,19 @@ if TYPE_CHECKING:
     from character import Character
     from shop import Shop
 
-SAVE_DIR  = "saves"
+SAVE_DIR = "saves"
 SAVE_FILE = os.path.join(SAVE_DIR, "savegame.json")
 
 
 def _ensure_save_dir():
     os.makedirs(SAVE_DIR, exist_ok=True)
 
+
 def save_game(character: "Character", shop: "Shop") -> bool:
     _ensure_save_dir()
     data = {
         "character": character.to_dict(),
-        "shop":      shop.to_dict(),
+        "shop": shop.to_dict(),
     }
     try:
         with open(SAVE_FILE, "w", encoding="utf-8") as f:
@@ -41,7 +42,7 @@ def load_game() -> tuple["Character", "Shop"] | None:
         with open(SAVE_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
         character = Character.from_dict(data["character"])
-        shop      = Shop.from_dict(data["shop"])
+        shop = Shop.from_dict(data["shop"])
         print(f"  Game loaded from {SAVE_FILE}.")
         return character, shop
     except (KeyError, ValueError, json.JSONDecodeError) as e:

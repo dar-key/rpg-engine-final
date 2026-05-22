@@ -1,43 +1,31 @@
 import sys
 import io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 from character import Character
-from item import Item, DEFAULT_ITEMS
 from shop import Shop
 from monster import Monster, DEFAULT_MONSTERS, prompt_new_monster
 from dungeon import Dungeon, prompt_new_dungeon
-
 from save import save_game, load_game, save_exists, delete_save
+from utils import *
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
-player:           Character | None = None
-shop:             Shop | None      = None
-monster_registry: list[Monster]    = list(DEFAULT_MONSTERS)  
+player_loaded = False
+player: Character
+shop: Shop
+monsters: list[Monster] = list(DEFAULT_MONSTERS)
 
 
 def _require_player() -> bool:
-    if player is None:
+    if not player_loaded:
         print("  No character loaded. Create or load one first.")
         return False
     return True
 
 
-def _banner():
-    print("""
-╔══════════════════════════════════════╗
-║          R P G   E N G I N E         ║
-║      Python Final Project v1.0       ║
-╚══════════════════════════════════════╝""")
-
-
-def _divider():
-    print("\n" + "─" * 40)
-
-
-
 def create_character():
-    global player
+    clear_screen()
+    global player, player_loaded
     print("\n  -- Create Character --")
     name = input("  Name: ").strip()
     if not name:
@@ -47,7 +35,7 @@ def create_character():
     print("  Distribute 15 stat points across STR / DEX / INT (min 1 each).")
     try:
         str_ = int(input("  Strength  (e.g. 7): "))
-        dex  = int(input("  Dexterity (e.g. 5): "))
+        dex = int(input("  Dexterity (e.g. 5): "))
         int_ = int(input("  Intellect (e.g. 3): "))
     except ValueError:
         print("  Invalid input. Using defaults (5/5/5).")
@@ -58,18 +46,21 @@ def create_character():
         print(f"  Stats must sum to 15, each at least 1. Got {total}. Using defaults.")
         str_, dex, int_ = 5, 5, 5
 
-    player = Character(name=name, strength=str_, dexterity=dex,
-                       intelligence=int_, hp=100, gold=50)
+    player = Character(
+        name=name, strength=str_, dexterity=dex, intelligence=int_, hp=100, gold=50
+    )
     print(f"\n  Character '{player.name}' created!")
+    clear_screen()
     player.show_stats()
-
+    player_loaded = True
 
 
 def character_menu():
     if not _require_player():
         return
+    clear_screen()
     while True:
-        _divider()
+        print_divider()
         print("  CHARACTER MENU")
         print("  1. View stats")
         print("  2. View inventory")
@@ -109,11 +100,14 @@ def character_menu():
         elif choice == "0":
             break
 
+        clear_screen()
 
 
 def monster_menu():
+    clear_screen()
+
     while True:
-        _divider()
+        print_divider()
         print("  MONSTER REGISTRY  [ENGINE]")
         print("  1. List all monsters")
         print("  2. View monster details")
@@ -123,16 +117,18 @@ def monster_menu():
 
         if choice == "1":
             print()
-            for i, m in enumerate(monster_registry, 1):
-                print(f"  {i:2}. {m.name:<20} HP:{m.max_hp}  STR:{m.strength}  DEX:{m.dexterity}")
+            for i, m in enumerate(monsters, 1):
+                print(
+                    f"  {i:2}. {m.name:<20} HP:{m.max_hp}  STR:{m.strength}  DEX:{m.dexterity}"
+                )
 
         elif choice == "2":
-            for i, m in enumerate(monster_registry, 1):
+            for i, m in enumerate(monsters, 1):
                 print(f"  {i}. {m.name}")
             try:
                 idx = int(input("  Monster #: ")) - 1
-                if 0 <= idx < len(monster_registry):
-                    monster_registry[idx].show_stats()
+                if 0 <= idx < len(monsters):
+                    monsters[idx].show_stats()
                 else:
                     print("  Invalid number.")
             except ValueError:
@@ -141,18 +137,19 @@ def monster_menu():
         elif choice == "3":
             m = prompt_new_monster()
             if m:
-                monster_registry.append(m)
+                monsters.append(m)
                 print(f"  '{m.name}' added to registry.")
 
         elif choice == "0":
             break
 
+        clear_screen()
 
 
 def dungeon_menu():
     if not _require_player():
         return
-    _divider()
+    print_divider()
     print("  DUNGEON")
     print("  1. Quick dungeon (default settings)")
     print("  2. Custom dungeon  [ENGINE]")
@@ -164,21 +161,21 @@ def dungeon_menu():
         dungeon.enter(player)
 
     elif choice == "2":
-        dungeon = prompt_new_dungeon(monster_registry)
+        dungeon = prompt_new_dungeon(monsters)
         if dungeon:
             dungeon.enter(player)
 
 
-
 def quick_fight():
+    clear_screen()
     if not _require_player():
         return
     print("\n  Quick Fight — choose an opponent:")
-    for i, m in enumerate(monster_registry, 1):
+    for i, m in enumerate(monsters, 1):
         print(f"  {i}. {m.name}")
     try:
         idx = int(input("  Monster #: ")) - 1
-        if not (0 <= idx < len(monster_registry)):
+        if not (0 <= idx < len(monsters)):
             print("  Invalid number.")
             return
     except ValueError:
@@ -186,13 +183,14 @@ def quick_fight():
         return
 
     from combat import run_combat
-    run_combat(player, monster_registry[idx].clone())
 
+    run_combat(player, monsters[idx].clone())
 
 
 def save_menu():
+    clear_screen()
     global player, shop
-    _divider()
+    print_divider()
     print("  SAVE / LOAD")
     print("  1. Save game")
     print("  2. Load game")
@@ -216,27 +214,32 @@ def save_menu():
         if confirm == "yes":
             delete_save()
 
+    clear_screen()
 
 
 def main():
-    global player, shop
+    global player, shop, player_loaded
 
     shop = Shop()
 
-    _banner()
+    print_banner()
 
     if save_exists():
         print("\n  A save file was found.")
         ans = input("  Load it? (y/n): ").strip().lower()
-        if ans == "y":
+        if ans != "n":
             result = load_game()
             if result:
                 player, shop = result
+                player_loaded = True
 
     while True:
-        _divider()
-        char_line = f"  [{player.name}  Lv.{player.level}  {player.hp:.0f}HP  {player.gold}g]" \
-                    if player else "  [No character]"
+        print_divider()
+        char_line = (
+            f"  [{player.name}  Lv.{player.level}  {player.hp:.1f}HP  {player.gold}g]"
+            if player_loaded
+            else "  [No character]"
+        )
         print(char_line)
         print()
         print("  MAIN MENU")
@@ -277,7 +280,7 @@ def main():
         elif choice == "0":
             if player:
                 ans = input("  Save before quitting? (y/n): ").strip().lower()
-                if ans == "y":
+                if ans != "n":
                     save_game(player, shop)
             print("\n  Goodbye!\n")
             break

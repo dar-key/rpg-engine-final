@@ -1,11 +1,8 @@
-from __future__ import annotations
-
-
 class Monster:
     SPEED_FORMULAS = {
         "default": lambda dex, bonus: dex * 0.5 + bonus,
-        "agile":   lambda dex, bonus: dex * 1.0 + bonus,
-        "slow":    lambda dex, bonus: dex * 0.25 + bonus,
+        "agile": lambda dex, bonus: dex * 1.0 + bonus,
+        "slow": lambda dex, bonus: dex * 0.25 + bonus,
     }
 
     def __init__(
@@ -26,9 +23,10 @@ class Monster:
         self.dexterity = dexterity
         self.xp_reward = xp_reward
         self.gold_reward = gold_reward
-        self.speed_formula = speed_formula if speed_formula in self.SPEED_FORMULAS else "default"
+        self.speed_formula = (
+            speed_formula if speed_formula in self.SPEED_FORMULAS else "default"
+        )
         self.custom_attrs: dict = custom_attrs or {}
-
 
     @property
     def speed(self) -> float:
@@ -38,7 +36,6 @@ class Monster:
     @property
     def damage(self) -> float:
         return self.strength * 1.5 + self.dexterity * 0.5
-
 
     def take_damage(self, amount: float):
         self.hp = max(0, self.hp - amount)
@@ -53,7 +50,6 @@ class Monster:
 
     def restore_full(self):
         self.hp = self.max_hp
-
 
     def show_stats(self):
         sep = "-" * 32
@@ -80,31 +76,30 @@ class Monster:
     def get_attr(self, key: str, default=None):
         return self.custom_attrs.get(key, default)
 
-
     def to_dict(self) -> dict:
         return {
-            "name":          self.name,
-            "max_hp":        self.max_hp,
-            "hp":            self.hp,
-            "strength":      self.strength,
-            "dexterity":     self.dexterity,
-            "xp_reward":     self.xp_reward,
-            "gold_reward":   self.gold_reward,
+            "name": self.name,
+            "max_hp": self.max_hp,
+            "hp": self.hp,
+            "strength": self.strength,
+            "dexterity": self.dexterity,
+            "xp_reward": self.xp_reward,
+            "gold_reward": self.gold_reward,
             "speed_formula": self.speed_formula,
-            "custom_attrs":  self.custom_attrs,
+            "custom_attrs": self.custom_attrs,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> "Monster":
         m = cls(
-            name          = data["name"],
-            hp            = data["max_hp"],
-            strength      = data["strength"],
-            dexterity     = data["dexterity"],
-            xp_reward     = data.get("xp_reward", 20),
-            gold_reward   = data.get("gold_reward", 10),
-            speed_formula = data.get("speed_formula", "default"),
-            custom_attrs  = data.get("custom_attrs", {}),
+            name=data["name"],
+            hp=data["max_hp"],
+            strength=data["strength"],
+            dexterity=data["dexterity"],
+            xp_reward=data.get("xp_reward", 20),
+            gold_reward=data.get("gold_reward", 10),
+            speed_formula=data.get("speed_formula", "default"),
+            custom_attrs=data.get("custom_attrs", {}),
         )
         m.hp = data.get("hp", m.max_hp)
         return m
@@ -116,25 +111,41 @@ class Monster:
 
 
 DEFAULT_MONSTERS: list[Monster] = [
-    Monster("Slime",        hp=20,  strength=3,  dexterity=2,  xp_reward=10,  gold_reward=5),
-    Monster("Goblin",       hp=35,  strength=6,  dexterity=8,  xp_reward=20,  gold_reward=10),
-    Monster("Orc Warrior",  hp=60,  strength=12, dexterity=4,  xp_reward=40,  gold_reward=20),
-    Monster("Dark Mage",    hp=40,  strength=15, dexterity=6,  xp_reward=50,  gold_reward=30,
-            custom_attrs={"element": "dark", "spell_power": 10}),
-    Monster("Dragon",       hp=150, strength=25, dexterity=10, xp_reward=200, gold_reward=100,
-            speed_formula="agile"),
+    Monster("Slime", hp=20, strength=3, dexterity=2, xp_reward=10, gold_reward=5),
+    Monster("Goblin", hp=35, strength=6, dexterity=8, xp_reward=20, gold_reward=10),
+    Monster(
+        "Orc Warrior", hp=60, strength=12, dexterity=4, xp_reward=40, gold_reward=25
+    ),
+    Monster(
+        "Dark Mage",
+        hp=70,
+        strength=15,
+        dexterity=6,
+        xp_reward=50,
+        gold_reward=30,
+        custom_attrs={"element": "dark", "spell_power": 10},
+    ),
+    Monster(
+        "Dragon",
+        hp=150,
+        strength=25,
+        dexterity=10,
+        xp_reward=200,
+        gold_reward=100,
+        speed_formula="agile",
+    ),
 ]
 
 
 def prompt_new_monster() -> "Monster | None":
     print("\n  -- Create New Monster --")
     try:
-        name    = input("  Name: ").strip()
-        hp      = int(input("  HP: "))
-        str_    = int(input("  Strength: "))
-        dex     = int(input("  Dexterity: "))
-        xp      = int(input("  XP reward: "))
-        gold    = int(input("  Gold reward: "))
+        name = input("  Name: ").strip()
+        hp = int(input("  HP: "))
+        str_ = int(input("  Strength: "))
+        dex = int(input("  Dexterity: "))
+        xp = int(input("  XP reward: "))
+        gold = int(input("  Gold reward: "))
         formula = input("  Speed formula (default/agile/slow): ").strip() or "default"
 
         monster = Monster(name, hp, str_, dex, xp, gold, formula)

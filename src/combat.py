@@ -1,6 +1,7 @@
 from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
+from utils import clear_screen
 
 if TYPE_CHECKING:
     from character import Character
@@ -9,23 +10,26 @@ if TYPE_CHECKING:
 
 class CombatResult:
     def __init__(self, victory: bool, xp: int = 0, gold: int = 0):
-        self.victory  = victory
-        self.xp_gained   = xp
+        self.victory = victory
+        self.xp_gained = xp
         self.gold_gained = gold
 
 
 def _build_turn_order(character: "Character", monster: "Monster") -> list:
     combatants = [
         (character.speed + random.uniform(0, 0.1), character),
-        (monster.speed   + random.uniform(0, 0.1), monster),
+        (monster.speed + random.uniform(0, 0.1), monster),
     ]
     combatants.sort(key=lambda x: x[0], reverse=True)
     return [c for _, c in combatants]
 
 
 def _use_potion(character: "Character") -> bool:
-    potions = [(i, item) for i, item in enumerate(character.inventory)
-               if item.item_type == "potion"]
+    potions = [
+        (i, item)
+        for i, item in enumerate(character.inventory)
+        if item.item_type == "potion"
+    ]
     if not potions:
         print("  You have no potions.")
         return False
@@ -48,14 +52,17 @@ def _use_potion(character: "Character") -> bool:
     character.heal(potion.hp_effect)
     character.remove_item(potion)
     healed = character.hp - old_hp
-    print(f"  Used {potion.name}. Restored {healed:.0f} HP. "
-          f"({character.hp:.0f}/{character.max_hp_total})")
+    print(
+        f"  Used {potion.name}. Restored {healed:.1f} HP. "
+        f"({character.hp:.1f}/{character.max_hp_total})"
+    )
     return True
 
 
 def run_combat(character: "Character", monster: "Monster") -> CombatResult:
+    clear_screen()
     print("\n" + "=" * 40)
-    print(f"  ⚔  COMBAT: {character.name}  vs  {monster.name}  ⚔")
+    print(f"  ⚔️ COMBAT: {character.name}  vs  {monster.name}  ⚔")
     print("=" * 40)
     monster.show_stats()
 
@@ -64,8 +71,10 @@ def run_combat(character: "Character", monster: "Monster") -> CombatResult:
     while character.is_alive() and monster.is_alive():
         round_num += 1
         print(f"\n  -- Round {round_num} --")
-        print(f"  {character.name}: {character.hp:.0f}/{character.max_hp_total} HP  |  "
-              f"{monster.name}: {monster.hp:.0f}/{monster.max_hp} HP")
+        print(
+            f"  {character.name}: {character.hp:.1f}/{character.max_hp_total} HP  |  "
+            f"{monster.name}: {monster.hp:.1f}/{monster.max_hp} HP"
+        )
 
         turn_order = _build_turn_order(character, monster)
 
@@ -84,14 +93,18 @@ def run_combat(character: "Character", monster: "Monster") -> CombatResult:
                 if action == "1":
                     dmg = character.damage * random.uniform(0.9, 1.1)
                     monster.take_damage(dmg)
-                    print(f"  {character.name} attacks {monster.name} for {dmg:.1f} damage!")
+                    print(
+                        f"  {character.name} attacks {monster.name} for {dmg:.1f} damage!"
+                    )
 
                 elif action == "2":
                     used = _use_potion(character)
                     if not used:
                         dmg = character.damage * random.uniform(0.9, 1.1)
                         monster.take_damage(dmg)
-                        print(f"  {character.name} attacks for {dmg:.1f} (no potion used).")
+                        print(
+                            f"  {character.name} attacks for {dmg:.1f} (no potion used)."
+                        )
 
                 elif action == "3":
                     flee_chance = 0.4 + max(0, (character.speed - monster.speed) * 0.02)
@@ -110,7 +123,11 @@ def run_combat(character: "Character", monster: "Monster") -> CombatResult:
             else:
                 dmg = monster.damage * random.uniform(0.85, 1.15)
                 character.take_damage(dmg)
-                print(f"  {monster.name} attacks {character.name} for {dmg:.1f} damage!")
+                print(
+                    f"  {monster.name} attacks {character.name} for {dmg:.1f} damage!"
+                )
+
+            clear_screen()
 
     print("\n" + "=" * 40)
     if character.is_alive():
@@ -119,8 +136,11 @@ def run_combat(character: "Character", monster: "Monster") -> CombatResult:
         print("=" * 40)
         character.gain_experience(monster.xp_reward)
         character.earn_gold(monster.gold_reward)
-        return CombatResult(victory=True, xp=monster.xp_reward, gold=monster.gold_reward)
+        return CombatResult(
+            victory=True, xp=monster.xp_reward, gold=monster.gold_reward
+        )
     else:
         print(f"  DEFEAT. {character.name} was slain by {monster.name}.")
         print("=" * 40)
+        character.restore_full()
         return CombatResult(victory=False)

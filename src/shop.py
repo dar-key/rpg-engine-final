@@ -1,5 +1,6 @@
 from item import Item, DEFAULT_ITEMS
 from typing import TYPE_CHECKING
+from utils import clear_screen
 
 if TYPE_CHECKING:
     from character import Character
@@ -7,12 +8,13 @@ if TYPE_CHECKING:
 
 class Shop:
 
-    DEFAULT_SELL_RATE = 0.5 
+    DEFAULT_SELL_RATE = 0.5
 
     def __init__(self, items: list[Item] | None = None, sell_rate: float | None = None):
         self.catalogue: list[Item] = items if items is not None else list(DEFAULT_ITEMS)
-        self.sell_rate: float = sell_rate if sell_rate is not None else self.DEFAULT_SELL_RATE
-
+        self.sell_rate: float = (
+            sell_rate if sell_rate is not None else self.DEFAULT_SELL_RATE
+        )
 
     def show_catalogue(self):
         if not self.catalogue:
@@ -23,14 +25,18 @@ class Shop:
         print("=" * 40)
         for i, item in enumerate(self.catalogue, 1):
             effects = []
-            if item.attack_effect: effects.append(f"ATK+{item.attack_effect}")
-            if item.hp_effect:     effects.append(f"HP+{item.hp_effect}")
+            if item.attack_effect:
+                effects.append(f"ATK+{item.attack_effect}")
+            if item.hp_effect:
+                effects.append(f"HP+{item.hp_effect}")
             if item.speed_effect:
                 sign = "+" if item.speed_effect > 0 else ""
                 effects.append(f"SPD{sign}{item.speed_effect}")
             fx_str = f"  [{', '.join(effects)}]" if effects else ""
-            print(f"  {i:2}. {item.name:<20} {item.price:>4}g  "
-                  f"({item.rarity}){fx_str}")
+            print(
+                f"  {i:2}. {item.name:<20} {item.price:>4}g  "
+                f"({item.rarity}){fx_str}"
+            )
         print("=" * 40)
         print(f"  Sell rate: {int(self.sell_rate * 100)}% of item price")
         print("=" * 40)
@@ -48,8 +54,10 @@ class Shop:
 
         character.spend_gold(item.price)
         character.add_item(item)
-        print(f"  Bought: {item.name} for {item.price}g. "
-              f"Remaining gold: {character.gold}g.")
+        print(
+            f"  Bought: {item.name} for {item.price}g. "
+            f"Remaining gold: {character.gold}g."
+        )
         return True
 
     def sell(self, character: "Character", inventory_index: int) -> bool:
@@ -66,10 +74,10 @@ class Shop:
 
         character.remove_item(item)
         character.earn_gold(sell_price)
-        print(f"  Sold: {item.name} for {sell_price}g. "
-              f"Total gold: {character.gold}g.")
+        print(
+            f"  Sold: {item.name} for {sell_price}g. " f"Total gold: {character.gold}g."
+        )
         return True
-
 
     def add_item(self, item: Item):
         self.catalogue.append(item)
@@ -102,6 +110,8 @@ class Shop:
 
     def open(self, character: "Character"):
         while True:
+            clear_screen()
+
             print("\n--- SHOP ---")
             print("  1. Browse catalogue")
             print("  2. Buy item")
@@ -145,7 +155,7 @@ class Shop:
             elif choice == "6":
                 self.show_catalogue()
                 try:
-                    idx   = int(input("  Edit item #: "))
+                    idx = int(input("  Edit item #: "))
                     price = int(input("  New price: "))
                     self.edit_item_price(idx, price)
                 except ValueError:
@@ -162,7 +172,6 @@ class Shop:
             else:
                 print("  Unknown option.")
 
-
     def to_dict(self) -> dict:
         return {
             "sell_rate": self.sell_rate,
@@ -175,18 +184,20 @@ class Shop:
         return cls(items=items, sell_rate=data.get("sell_rate", cls.DEFAULT_SELL_RATE))
 
 
-
 def _prompt_new_item() -> Item | None:
+
     print("\n  -- Create New Item --")
     try:
-        name      = input("  Name: ").strip()
-        itype     = input("  Type (weapon / armor / potion): ").strip().lower()
-        price     = int(input("  Price (gold): "))
-        rarity    = input("  Rarity (common/uncommon/rare/epic/legendary): ").strip().lower()
-        desc      = input("  Description: ").strip()
-        atk       = int(input("  Attack effect (0 if none): "))
-        hp        = int(input("  HP effect (0 if none): "))
-        spd       = int(input("  Speed effect (0 if none): "))
+        name = input("  Name: ").strip()
+        itype = input("  Type (weapon / armor / potion): ").strip().lower()
+        price = int(input("  Price (gold): "))
+        rarity = (
+            input("  Rarity (common/uncommon/rare/epic/legendary): ").strip().lower()
+        )
+        desc = input("  Description: ").strip()
+        atk = int(input("  Attack effect (0 if none): "))
+        hp = int(input("  HP effect (0 if none): "))
+        spd = int(input("  Speed effect (0 if none): "))
         return Item(name, itype, price, desc, rarity, atk, hp, spd)
     except ValueError as e:
         print(f"  Error creating item: {e}")
